@@ -2,6 +2,8 @@
 
 Crea historietas completas con las API de Pollinations AI: guiones automáticos, imágenes generadas, subpaneles dinámicos, edición de guiones y descarga como presentación interactiva o tira cómica.
 
+[Demo](https://juanrivera126.github.io/Generador-de-comics---V2/Ejemplos/Demo/)
+
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Languages](https://img.shields.io/badge/languages-ES%20|%20EN%20|%20FR-brightgreen)
 
