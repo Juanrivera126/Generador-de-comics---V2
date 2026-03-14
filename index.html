@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    
+<title>Generador de Cómics con IA</title>
+
+
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--title>Generador de Cómics con IA</title-->
+    <link rel="stylesheet" href="styles.css">
+   
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">🌙</button>
+            <h1>Generador de Cómics con IA</h1>
+            <p>Introduce una idea para la historia y mira cómo la IA crea una tira cómica de 4 paneles</p>
+            <div class="tab-navigation">
+                <button id="generatorTab" class="tab-btn active" >Generador</button>
+                <button id="settingsTab" class="tab-btn">Ajustes</button>
+            </div>
+        </header>
+
+        <div id="generatorView" class="view">
+            <div class="input-section">
+                <textarea id="promptInput" placeholder="Introduce tu idea para la historia... (ej., 'Un robot hace inventos locos', 'Un gato descubre que puede volar', 'Dos aliens discuten sobre comida terrestre')" rows="3"></textarea>
+                <div class="settings-row">
+                    <label for="artStyleSelect">Estilo de Arte:</label>
+                    <select id="artStyleSelect">
+                        <option value="none">Ninguno</option>
+                        <option value="cartoon">Caricatura</option>
+                        <option value="realistic">Realista</option>
+                        <option value="anime">Anime</option>
+                        <option value="comic">Cómic</option>
+                        <option value="watercolor">Acuarela</option>
+                        <option value="sketch">Boceto</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <div class="settings-row" id="customStyleRow" style="display: none;">
+                    <label for="customStyleInput">Estilo Personalizado:</label>
+                    <input type="text" id="customStyleInput" placeholder="Ej: 'estilo Ukiyo-e japonés', 'art nouveau', 'pintura al óleo renacentista', 'pixel art 8-bit'" w-tid="67"/>
+                </div>
+                <div class="settings-row">
+                    <label for="imgToImgCheck">Imagen-a-Imagen:</label>
+                    <input type="checkbox" id="imgToImgCheck">
+                    <span class="checkbox-label">Fuerza el uso del modelo gemini banana nano</span>
+                </div>
+                <div class="settings-row">
+                    <label for="panelCountSelect">Número de Paneles:</label>
+                    <select id="panelCountSelect">
+                        <option value="3">3 Paneles</option>
+                        <option value="4" selected>4 Paneles</option>
+                        <option value="5">5 Paneles</option>
+                        <option value="6">6 Paneles</option>
+                    </select>
+                </div>
+                <div class="button-row">
+                    <button id="generateBtn" class="generate-btn" >
+                        <span class="btn-text">Generar Cómic</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                    <button id="clearBtn" class="clear-btn">Limpiar</button>
+                    <button id="cancelBtn" class="cancel-btn" >Cancelar</button>
+                </div>
+                <button id="continueBtn" class="continue-btn" style="display: none;">
+                    <span class="btn-text">Continuar Historia</span>
+                    <div class="loading-spinner"></div>
+                </button>
+                <button id="changeThemeBtn" class="change-theme-btn" style="display: none;">
+                    <span class="btn-text">🔄 Cambiar Tema</span>
+                    <div class="loading-spinner"></div>
+                </button>
+                <button id="regenerateBtn" class="regenerate-btn" style="display: none;">
+                    <span class="btn-text">Regenerar Imágenes</span>
+                    <div class="loading-spinner"></div>
+                </button>
+                <div class="download-buttons" style="display: none; gap: 1rem; margin-top: 1rem;">
+                    <button id="publishBtn" class="publish-btn">
+                        <span class="btn-text">📺 Descargar Presentación</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                    <button id="downloadComicBtn" class="download-comic-btn">
+                        <span class="btn-text">🎨 Descargar Tira Cómica</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                </div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Listo para generar</div>
+            </div>
+            <div class="comic-grid" id="comicGrid">
+                <div class="panel" id="panel1">
+                    <div class="panel-number">1</div>
+                    <div class="panel-placeholder">Panel 1</div>
+                    <div class="speech-bubble"></div>
+                </div>
+                <div class="panel" id="panel2">
+                    <div class="panel-number">2</div>
+                    <div class="panel-placeholder">Panel 2</div>
+                    <div class="speech-bubble"></div>
+                </div>
+                <div class="panel" id="panel3">
+                    <div class="panel-number">3</div>
+                    <div class="panel-placeholder">Panel 3</div>
+                    <div class="speech-bubble"></div>
+                </div>
+                <div class="panel" id="panel4">
+                    <div class="panel-number">4</div>
+                    <div class="panel-placeholder">Panel 4</div>
+                    <div class="speech-bubble"></div>
+                </div>
+                <div class="panel" id="panel5">
+                    <div class="panel-number">5</div>
+                    <div class="panel-placeholder">Panel 5</div>
+                    <div class="speech-bubble"></div>
+                </div>
+                <div class="panel" id="panel6">
+                    <div class="panel-number">6</div>
+                    <div class="panel-placeholder">Panel 6</div>
+                    <div class="speech-bubble"></div>
+                </div>
+            </div>
+            <div class="script-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;">Guion Generado</h3>
+                    <button id="updateScriptBtn" class="update-script-btn" style="display: none;">
+                        <span class="btn-text">🔄 Actualizar Guión</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                </div>
+                <pre id="scriptOutput"></pre>
+            </div>
+        </div>
+
+        <div id="settingsView" class="view" style="display: none;">
+            <div class="settings-header">
+                <h2>Ajustes</h2>
+                <p>Configura los ajustes de la API para la generación de texto e imágenes</p>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Idioma / Language / Langue</h3>
+                <div class="settings-row">
+                    <label for="languageSelector">Idioma:</label>
+                    <select id="languageSelector">
+                        <option value="es" selected>Español</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Relación de Aspecto de Diapositivas</h3>
+                <div class="settings-row">
+                    <label for="aspectRatioSelector">Relación de Aspecto:</label>
+                    <select id="aspectRatioSelector">
+                        <option value="16:9" selected>16:9 (Horizontal - Presentaciones)</option>
+                        <option value="1:1">1:1 (Cuadrado - Redes Sociales)</option>
+                        <option value="9:16">9:16 (Vertical - Móvil/Stories)</option>
+                    </select>
+                </div>
+                <p class="settings-hint">Define las dimensiones de las diapositivas en la presentación descargada.</p>
+            </div>
+
+            <div class="settings-section">
+                <h3>API de Generación de Texto</h3>
+                <div class="settings-row">
+                    <label for="modelSelector">Modelo:</label>
+                    <select id="modelSelector">
+                        <option value="openai" selected>OpenAI</option>
+                            <option value="openai-large">OpenAI Large</option>
+                            <option value="gemini-large">Gemini Large</option>
+                            <option value="gemini">Gemini</option>
+                            <option value="claude">Claude</option>
+                            <option value="grok">Grok</option>
+                            <option value="perplexity-fast">Perplexity Fast</option>
+                            <option value="kimi-k2-thinking">Kimi K2 Thinking</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>API de Generación de Imágenes</h3>
+                <div class="settings-row">
+                    <label for="imageApiSelect">API de Imagen:</label>
+                    <select id="imageApiSelect">
+                        <option value="pollinations">Pollinations</option>
+                        <option value="inbuilt">Integrada (Websim)</option>
+                    </select>
+                </div>
+                
+                <div id="pollinationsSettings" style="display: none;" w-tid="273">
+                    <div class="settings-row">
+                        <label for="pollinationsModelSelect">Modelo:</label>
+                        <select id="pollinationsModelSelect">
+                            <option value="flux" selected>Flux</option>
+                            <option value="zimage">Z Image</option>
+							<option value="kontext">Flux Kontext</option>
+							<option value="gptimage">GPT Image</option>
+                            <option value="nanobanana">Nano Banana</option>
+							<option value="nanobanana-pro">Nano Banana Pro</option>
+                            <option value="seedream">Seedream 4.0</option>
+							<option value="seedream-pro">Seedream 4.5</option>
+							<option value="flux-2-dev">Flux.2 Dev</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Clave API de Pollinations</h3>
+                    <div class="settings-row">
+                        <label for="apiKeyInput">Clave API:</label>
+                        <div class="api-key-input-container">
+                            <input type="password" id="apiKeyInput" placeholder="plln_sk_..." style="flex-grow: 1;">
+                            <button id="getApiKeyBtn" class="get-api-key-btn" title="Obtener API Key automáticamente">
+                                🔑 Obtener Key
+                            </button>
+                        </div>
+                    </div>
+                    <p class="settings-hint">Obtén tu propia clave para una generación más rápida y personal.</p>
+                </div>
+            </div>
+            
+            <div class="settings-actions">
+                <button id="saveSettingsBtn" class="save-settings-btn">Guardar Ajustes</button>
+                <button id="resetSettingsBtn" class="reset-settings-btn">Restablecer a Valores Predeterminados</button>
+                <button id="cleanStorageBtn" class="clean-storage-btn" style="background-color: #ff6b6b; margin-top: 0.5rem;">🗑️ Limpiar Almacenamiento</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 1rem; font-size: 0.8rem;">
+        Diseñado por Juan Guillermo Rivera Berrío con tecnología Gemini 2.5 Pro (idea original de dimlylitsouls en WebSim)
+    </footer>
+    <script src="script.js"></script>
+
+</body>
+</html>
